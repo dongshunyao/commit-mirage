@@ -1,5 +1,6 @@
 import fnmatch
 import json
+import random
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -256,7 +257,9 @@ class CodebaseAnalyzer:
     def select_modification_targets(self, codebase_summary: Dict, commits: int) -> List[Dict]:
         repo_overview = self._prepare_repo_overview(codebase_summary)
 
-        # TODO 选择1到3*commits文件，max(len(codebase_summary)-1), min(0)
+        file_count = random.randint(1, 3 * commits)
+        file_count = min(file_count, codebase_summary["total_files"])
+
         prompt = f"""
         你是一个代码分析专家。我需要你帮我选择在一个代码仓库中要修改的文件，用于创建{commits}个Git提交。
 
@@ -264,7 +267,7 @@ class CodebaseAnalyzer:
         {json.dumps(repo_overview, indent=2, ensure_ascii=False)}
 
         要求：
-        1. 选择{commits}个不同的文件进行修改
+        1. 选择{file_count}个不同的文件进行修改，不能重复选择文件！
         2. 每个文件要能支持"添加功能->删除功能"的操作序列
         3. 优先选择具有以下特征的文件：
            - 有函数和类可以扩展
@@ -289,8 +292,9 @@ class CodebaseAnalyzer:
             response = self._call_llm(prompt)
             result = json.loads(response)
             return result["selected_files"]
-        except:
-            return self._fallback_selection(codebase_summary, commits)
+        except Exception as e:
+            print(f"⚠️ LLM选择失败，使用回退策略: {e}")
+            return self._fallback_selection(codebase_summary, file_count)
 
     def _prepare_repo_overview(self, codebase_summary: Dict) -> Dict:
         overview = {
@@ -334,8 +338,8 @@ class CodebaseAnalyzer:
 
         raise Exception
 
-    def _fallback_selection(self, codebase_summary: Dict, num_commits: int) -> List[Dict]:
-        candidates = codebase_summary["modification_candidates"][:num_commits]
+    def _fallback_selection(self, codebase_summary: Dict, file_count: int) -> List[Dict]:
+        candidates = codebase_summary["modification_candidates"][:file_count]
 
         selected = []
         for candidate in candidates:
@@ -363,4 +367,3 @@ if __name__ == "__main__":
 
     y = c.select_modification_targets(x, 3)
     print(json.dumps(y, indent=2, ensure_ascii=False))
-

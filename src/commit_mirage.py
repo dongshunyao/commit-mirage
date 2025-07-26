@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 from datetime import datetime
 from random import randrange
 
@@ -42,7 +43,7 @@ class CommitMirage:
         random_times = self.get_random_times()
 
         if git.check_dirty(self.opts["dir"]):
-            printerr("This program only works with a clean work dir.")
+            printerr("此程序只能在干净的工作目录中运行。")
             sys.exit(3)
         if self.opts["commit"] != None:
             branch = git.get_branch_name(self.opts["dir"])
