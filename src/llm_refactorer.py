@@ -6,11 +6,11 @@ class LLMRefactorer:
     def __init__(self, llm_config: Dict[str, Any]):
         self.llm_config = llm_config
 
-    def create_refactor_plan(self, target_files: List[Dict]) -> List[Dict]:
+    def create_refactor_plan(self, target_files: List[Dict], dir) -> List[Dict]:
         refactor_plan = []
 
         for i, file_target in enumerate(target_files):
-            file_path = file_target["file_path"]
+            file_path = os.path.join(dir, file_target["file_path"])
 
             with open(file_path, 'r', encoding='utf-8') as f:
                 original_content = f.read()

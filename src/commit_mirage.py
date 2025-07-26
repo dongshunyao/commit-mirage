@@ -39,7 +39,7 @@ class CommitMirage:
         current = None
         codebase_summary = self.analyzer.analyze_repository(Path(self.opts["dir"]))
         target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
-        refactor_plan = self.refactorer.create_refactor_plan(target_files)
+        refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
         random_times = self.get_random_times()
 
         if git.check_dirty(self.opts["dir"]):
