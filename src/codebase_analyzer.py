@@ -1,6 +1,7 @@
 import fnmatch
 import json
 import random
+from math import floor
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -85,7 +86,7 @@ class CodebaseAnalyzer:
                     code_files.append(file_info)
 
                 except Exception as e:
-                    print_err(f"⚠️ 跳过文件 {file_path}: {e}")
+                    print_err(f"跳过文件 {file_path}: {e}")
                     continue
 
         return code_files
@@ -196,8 +197,8 @@ class CodebaseAnalyzer:
         candidates = []
 
         for file_info in code_files:
-            min_lines = 20 if file_info["language"] in ["python", "javascript", "typescript"] else 40
-            max_lines = 800 if file_info["language"] in ["c", "cpp", "java"] else 600
+            min_lines = 20
+            max_lines = 600
 
             if min_lines <= file_info["lines"] <= max_lines:
                 candidate = {
@@ -264,8 +265,11 @@ class CodebaseAnalyzer:
     def select_modification_targets(self, codebase_summary: Dict, commits: int) -> List[Dict]:
         repo_overview = self._prepare_repo_overview(codebase_summary)
 
-        file_count = random.randint(1, 3 * commits)
-        file_count = min(file_count, codebase_summary["total_files"])
+        if codebase_summary["total_files"] < commits - 1:
+            print_err(f"没有足够合适的文件")
+            raise Exception
+
+        file_count = random.randint(commits - 1, min(codebase_summary["total_files"], floor(2.1 * commits)))
 
         prompt = f"""
         你是一个代码分析专家。我需要你帮我选择在一个代码仓库中要修改的文件，用于创建{commits}个Git提交。
@@ -300,7 +304,7 @@ class CodebaseAnalyzer:
             result = json.loads(response)
             return result["selected_files"]
         except Exception as e:
-            print_err(f"⚠️ LLM选择失败，使用回退策略: {e}")
+            print_err(f"LLM选择失败，使用回退策略: {e}")
             return self._fallback_selection(codebase_summary, file_count)
 
     def _prepare_repo_overview(self, codebase_summary: Dict) -> Dict:
@@ -338,6 +342,7 @@ class CodebaseAnalyzer:
         return selected
 
 
+# TODO delete
 if __name__ == "__main__":
     c = CodebaseAnalyzer({
         "api_key": "sk-2Lnu8Q3cLlMqIP2t6d428b1b678c4d13A4A7F53434C8E791",

@@ -47,7 +47,6 @@ class CommitMirage:
         target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
-
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
 
@@ -63,7 +62,7 @@ class CommitMirage:
             # current = git.get_head_hash(self.opts["dir"])
             self.print_debug(f"{t} {datetime.fromtimestamp(t).isoformat()}")
 
-        patch = git.diff(f"{current}~{self.opts["times"]}", current, self.opts["dir"])
+        patch = git.diff(f"{current}~{self.opts['times']}", current, self.opts["dir"])
         if len(patch.trim()) != 0:
             git.apply_reverse(patch, self.opts["dir"])
             git.commit_amend_with_time(random_times[-1], self.opts["dir"])

@@ -50,5 +50,9 @@ if __name__ == "__main__":
         print_err("Generate times must be 2 or larger.")
         sys.exit(2)
 
+    if opts["times"] > 10:
+        print_err("Generate times must less or equal to 10.")
+        sys.exit(2)
+
     generator = CommitMirage(opts)
     generator.run()
