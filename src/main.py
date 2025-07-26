@@ -1,10 +1,10 @@
 import argparse
-import time
 import sys
+import time
 
-from src.utils import printerr
+from src import git
 from src.commit_mirage import CommitMirage
-import src.git
+from src.utils import print_err
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Commit Mirage")
@@ -29,25 +29,25 @@ if __name__ == "__main__":
         "api_key": args.api_key
     }
 
-    if args.start == None:
-        if opts["commit"] == None:
+    if args.start is None:
+        if opts["commit"] is None:
             opts["start"] = int(git.get_head_time(opts["dir"]))
         else:
             opts["start"] = int(git.get_commit_time(opts["commit"], opts["dir"]))
     else:
         opts["start"] = args.start
 
-    if args.end == None:
+    if args.end is None:
         opts["end"] = int(time.time())
     else:
         opts["end"] = args.end
 
     if opts["end"] < opts["start"]:
-        printerr("End time should not be earlier than start time.")
+        print_err("End time should not be earlier than start time.")
         sys.exit(1)
 
     if opts["times"] < 3:
-        printerr("Generate times must be 3 or larger.")
+        print_err("Generate times must be 3 or larger.")
         sys.exit(2)
 
     generator = CommitMirage(opts)
