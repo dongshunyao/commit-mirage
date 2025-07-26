@@ -2,8 +2,9 @@ from pathlib import Path
 from typing import Dict, Any
 
 from commit_manager import CommitManager
-from llm_analyzer import CodebaseAnalyzer
-from llm_refactor import LLMRefactorer
+
+from src.codebase_analyzer import CodebaseAnalyzer
+from src.llm_refactorer import LLMRefactorer
 
 
 class CommitMirage:
