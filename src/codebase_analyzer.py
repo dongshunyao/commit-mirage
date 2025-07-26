@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 from call_llm import call_llm
+from utils import print_err
 
 
 class CodebaseAnalyzer:
@@ -84,7 +85,7 @@ class CodebaseAnalyzer:
                     code_files.append(file_info)
 
                 except Exception as e:
-                    print(f"⚠️ 跳过文件 {file_path}: {e}")
+                    print_err(f"⚠️ 跳过文件 {file_path}: {e}")
                     continue
 
         return code_files
@@ -299,7 +300,7 @@ class CodebaseAnalyzer:
             result = json.loads(response)
             return result["selected_files"]
         except Exception as e:
-            print(f"⚠️ LLM选择失败，使用回退策略: {e}")
+            print_err(f"⚠️ LLM选择失败，使用回退策略: {e}")
             return self._fallback_selection(codebase_summary, file_count)
 
     def _prepare_repo_overview(self, codebase_summary: Dict) -> Dict:
