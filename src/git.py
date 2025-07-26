@@ -64,4 +64,4 @@ def diff(old, new, dir="."):
 
 def apply_reverse(patch, dir="."):
     command = "git apply -R"
-    return check_output(command, stdin=patch, cwd=dir, encoding="utf-8", shell=True)
+    return check_output(command, input=patch, cwd=dir, encoding="utf-8", shell=True)

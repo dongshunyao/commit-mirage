@@ -94,7 +94,7 @@ class CommitMirage:
                     final_plan[-1].append(add_plan[current])
             final_plan.append([delete_plan[-1]])
 
-        self.print_debug(final_plan)
+        self.print_debug(json.dumps(final_plan, indent=2, ensure_ascii=False))
 
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
