@@ -114,7 +114,7 @@ class LLMRefactorer:
     def _call_llm(self, prompt: str) -> str:
         if self.llm_config["provider"] == "openai":
             import openai
-            client = openai.OpenAI(api_key=self.llm_config["api_key"])
+            client = openai.OpenAI(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
             response = client.chat.completions.create(
                 model=self.llm_config["model"],
                 messages=[{"role": "user", "content": prompt}],
@@ -122,13 +122,15 @@ class LLMRefactorer:
             return response.choices[0].message.content
         elif self.llm_config["provider"] == "anthropic":
             import anthropic
-            client = anthropic.Anthropic(api_key=self.llm_config["api_key"])
+            client = anthropic.Anthropic(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
             response = client.messages.create(
                 model=self.llm_config["model"],
-                max_tokens=6000,
+                max_tokens=8192,
                 messages=[{"role": "user", "content": prompt}]
             )
-            return response.content[0].text
+
+            if response.stop_reason == "end_turn":
+                return response.content[0].text
 
         raise Exception
 

@@ -318,7 +318,7 @@ class CodebaseAnalyzer:
     def _call_llm(self, prompt: str) -> str:
         if self.llm_config["provider"] == "openai":
             import openai
-            client = openai.OpenAI(api_key=self.llm_config["api_key"])
+            client = openai.OpenAI(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
             response = client.chat.completions.create(
                 model=self.llm_config["model"],
                 messages=[{"role": "user", "content": prompt}],
@@ -326,13 +326,15 @@ class CodebaseAnalyzer:
             return response.choices[0].message.content
         elif self.llm_config["provider"] == "anthropic":
             import anthropic
-            client = anthropic.Anthropic(api_key=self.llm_config["api_key"])
+            client = anthropic.Anthropic(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
             response = client.messages.create(
                 model=self.llm_config["model"],
                 max_tokens=8192,
                 messages=[{"role": "user", "content": prompt}]
             )
-            return response.content[0].text
+
+            if response.stop_reason == "end_turn":
+                return response.content[0].text
 
         raise Exception
 
@@ -350,3 +352,14 @@ class CodebaseAnalyzer:
             })
 
         return selected
+
+
+if __name__ == "__main__":
+    c = CodebaseAnalyzer({
+        "api_key": "sk-2Lnu8Q3cLlMqIP2t6d428b1b678c4d13A4A7F53434C8E791",
+        "base_url": "",
+        "model": "claude-sonnet-4-20250514",
+        "provider": "anthropic"
+    })
+
+    c.analyze_repository(Path(r"C:\Users\dongs\Desktop\sudo-win"))
