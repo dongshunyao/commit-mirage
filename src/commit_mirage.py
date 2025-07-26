@@ -48,13 +48,6 @@ class CommitMirage:
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
 
-        # TODO delete
-        for i in range(len(refactor_plan)):
-            if i % 2 == 0:
-                item = refactor_plan[i]
-                with open(item["file_path"], 'w', encoding='utf-8') as f:
-                    f.write(item["new_content"])
-
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
 
@@ -69,7 +62,12 @@ class CommitMirage:
             # git.commit_with_time(message, t, self.opts["dir"])
             # current = git.get_head_hash(self.opts["dir"])
             self.print_debug(f"{t} {datetime.fromtimestamp(t).isoformat()}")
-        # TODO: Check final state and may add revert.
+
+        patch = git.diff(f"{current}~{self.opts["times"]}", current, self.opts["dir"])
+        if len(patch.trim()) != 0:
+            git.apply_reverse(patch, self.opts["dir"])
+            git.commit_amend_with_time(random_times[-1], self.opts["dir"])
+
         if self.opts["commit"] is not None:
             git.rebase(TEMP_BRANCH_NAME, branch, self.opts["dir"])
             git.checkout(branch, self.opts["dir"])
