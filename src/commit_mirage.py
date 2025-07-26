@@ -3,10 +3,10 @@ from datetime import datetime
 from pathlib import Path
 from random import randrange
 
-from src import git
-from src.codebase_analyzer import CodebaseAnalyzer
-from src.llm_refactorer import LLMRefactorer
-from src.utils import print_err
+import git
+from codebase_analyzer import CodebaseAnalyzer
+from llm_refactorer import LLMRefactorer
+from utils import print_err
 
 TEMP_BRANCH_NAME = "cmtemp"
 

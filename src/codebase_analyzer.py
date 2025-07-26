@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 from typing import List, Dict, Any
 
-from src.call_llm import call_llm
+from call_llm import call_llm
 
 
 class CodebaseAnalyzer:

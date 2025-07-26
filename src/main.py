@@ -2,9 +2,9 @@ import argparse
 import sys
 import time
 
-from src import git
-from src.commit_mirage import CommitMirage
-from src.utils import print_err
+import git
+from commit_mirage import CommitMirage
+from utils import print_err
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Commit Mirage")
