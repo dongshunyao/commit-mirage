@@ -64,8 +64,7 @@ class LLMRefactorer:
         格式：
         {{
             "modified_code": "完整的修改后代码",
-            "changes_description": "添加了什么功能的简短描述",
-            "commit_message": "Git提交信息"
+            "commit_message": "精简的英文Git提交信息，不需要任何前缀"
         }}
         """
 
@@ -90,13 +89,12 @@ class LLMRefactorer:
         2. 确保代码完全回到原始状态
         3. 不要遗留任何添加的代码
 
-        请返回删除功能后的代码，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析，不需要返回markdown代码块：
+        请返回删除功能后的代码，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析，不需要返回markdown代码块。
 
         格式：
         {{
             "modified_code": "删除功能后的完整代码",
-            "changes_description": "删除了什么功能的描述",
-            "commit_message": "Git提交信息"
+            "commit_message": "精简的英文Git提交信息，不需要任何前缀，尽量使用Update去描述，不要使用Delete/Remove/Revert描述"
         }}
         """
 
@@ -107,14 +105,12 @@ class LLMRefactorer:
             {
                 "file_path": file_path,
                 "new_content": add_result['modified_code'],
-                "commit_message": f"{commit_prefix} {add_result['commit_message']}",
-                "description": add_result['changes_description']
+                "commit_message": add_result['commit_message'],
             },
             {
                 "file_path": file_path,
                 "new_content": remove_result['modified_code'],
-                "commit_message": f"{commit_prefix} {remove_result['commit_message']}",
-                "description": remove_result['changes_description']
+                "commit_message": remove_result['commit_message'],
             }
         ]
 
@@ -129,6 +125,5 @@ class LLMRefactorer:
 
             return {
                 "modified_code": response,
-                "changes_description": "LLM响应解析失败",
                 "commit_message": "自动生成的更改"
             }

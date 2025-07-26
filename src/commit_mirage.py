@@ -107,10 +107,8 @@ class CommitMirage:
             if len(c) == 0:
                 continue
 
-            message = ""
+            message = c[0]["commit_message"]
             for p in c:
-                message += p["commit_message"]
-                message += " "
                 with open(p["file_path"], 'w', encoding='utf-8') as f:
                     f.write(p["new_content"])
             git.add_all(self.opts["dir"])
@@ -122,14 +120,12 @@ class CommitMirage:
 
         patch = git.diff(f"{current}~{self.opts['times']}", current, self.opts["dir"])
         if len(patch.strip()) != 0:
-            self.print_debug(patch)
             try:
                 git.apply_reverse(patch, self.opts["dir"])
                 git.add_all(self.opts["dir"])
                 git.commit_amend_with_time(random_times[-1], self.opts["dir"])
             except:
-                # I hate Windows.
-                pass
+                self.print_debug(patch)
 
         if self.opts["commit"] is not None:
             git.rebase(TEMP_BRANCH_NAME, branch, self.opts["dir"])
