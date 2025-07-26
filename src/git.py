@@ -1,0 +1,44 @@
+from subprocess import check_output
+
+def get_commit_time(commit, dir="."):
+    command = f"git show --no-patch --date=unix --format=%ad {commit}"
+    return check_output(command, cwd=dir, encoding="utf-8").strip()
+
+def get_head_time(dir="."):
+    return get_commit_time("HEAD", dir)
+
+def get_head_hash(dir="."):
+    command = "git rev-parse HEAD"
+    return check_output(command, cwd=dir, encoding="utf-8").strip()
+
+def add_all(dir="."):
+    command = "git add -A"
+    return check_output(command, cwd=dir, encoding="utf-8")
+
+def commit_with_time(message, time, dir="."):
+    command = f'git commit --message="{message}" --date="{time}"'
+    return check_output(command, cwd=dir, encoding="utf-8")
+
+def check_dirty(dir="."):
+    command = "git status --porcelain --ignore-submodules=dirty"
+    return len(check_output(command, cwd=dir, encoding="utf-8").strip()) > 0
+
+def get_branch_name(dir="."):
+    command = "git rev-parse --abbrev-ref HEAD"
+    return check_output(command, cwd=dir, encoding="utf-8").strip()
+
+def new_branch(branch, commit, dir="."):
+    command = f"git checkout -b {branch} {commit}"
+    return check_output(command, cwd=dir, encoding="utf-8")
+
+def delete_branch(branch, dir="."):
+    command = f"git branch -D {branch}"
+    return check_output(command, cwd=dir, encoding="utf-8")
+
+def checkout(commit, dir="."):
+    command = f"git commit {commit}"
+    return check_output(command, cwd=dir, encoding="utf-8")
+
+def rebase(branch, target, dir="."):
+    command = f"git rebase {branch} {target}"
+    return check_output(command, cwd=dir, encoding="utf-8")
