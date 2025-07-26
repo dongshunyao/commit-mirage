@@ -6,7 +6,7 @@ from commit_manager import CommitManager
 
 from src.codebase_analyzer import CodebaseAnalyzer
 from src.llm_refactorer import LLMRefactorer
-
+from src import git
 from src.utils import printerr
 
 TEMP_BRANCH_NAME = "cmtemp"
@@ -14,6 +14,13 @@ TEMP_BRANCH_NAME = "cmtemp"
 class CommitMirage:
     def __init__(self, opts):
         self.opts = opts
+        llm_config = {
+            "provider": self.opts["provider"],
+            "base_url": self.opts["base_url"],
+            "api_key": self.opts["api_key"]
+        }
+        self.analyzer = CodebaseAnalyzer(llm_config)
+        self.refactorer = LLMRefactorer(llm_config)
 
     def printdebug(self, *args, **kwargs):
         if self.opts["debug"]:
@@ -30,6 +37,11 @@ class CommitMirage:
     def run(self):
         branch = None
         current = None
+        codebase_summary = self.analyzer.analyze_repository(self.opts["dir"])
+        target_files = self.analyzer.select_modification_targets(codebase_summary, commits)
+        refactor_plan = self.refactorer.create_refactor_plan(target_files)
+        random_times = self.get_random_times()
+
         if git.check_dirty(self.opts["dir"]):
             printerr("This program only works with a clean work dir.")
             sys.exit(3)
@@ -37,8 +49,8 @@ class CommitMirage:
             branch = git.get_branch_name(self.opts["dir"])
             self.printdebug(f"branch name: {branch}")
             git.new_branch(TEMP_BRANCH_NAME, self.opts["commit"], self.opts["dir"])
-        randomTimes = self.get_random_times()
-        for t in randomTimes:
+        for i in range(0, len(random_times)):
+            t = random_times[i]
             # message = modify_work_space()
             # git.add_all(self.opts["dir"])
             # git.commit_with_time(message, t, self.opts["dir"])
