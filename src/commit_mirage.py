@@ -1,5 +1,6 @@
 import sys
 import time
+import json
 from datetime import datetime
 from pathlib import Path
 from random import randrange
@@ -49,6 +50,10 @@ class CommitMirage:
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
 
+        if len(refactor_plan) < 2 * (self.opts["times"] - 1):
+            print_err("项目内可以修改的文件不足。请降低提交次数。")
+            sys.exit(4)
+
         final_plan = []
         add_plan = []
         delete_plan = []
@@ -87,6 +92,7 @@ class CommitMirage:
                     final_plan[-1].append(add_plan[current])
             final_plan.append([delete_plan[-1]])
 
+        self.print_debug(json.dumps(final_plan, indent=2, ensure_ascii=False))
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
 
@@ -98,13 +104,18 @@ class CommitMirage:
         for i in range(0, self.opts["times"]):
             t = random_times[i]
             c = final_plan[i]
+            if len(c) == 0:
+                continue
+
             message = ""
             for p in c:
                 message += p["commit_message"]
-                message += "\n"
+                message += " "
                 with open(p["file_path"], 'w', encoding='utf-8') as f:
                     f.write(p["new_content"])
             git.add_all(self.opts["dir"])
+            if len(message.strip()) == 0:
+                message = "Update"
             git.commit_with_time(message, t, self.opts["dir"])
             current = git.get_head_hash(self.opts["dir"])
             self.print_debug(f"{t} {datetime.fromtimestamp(t).isoformat()}")
