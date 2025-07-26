@@ -272,7 +272,7 @@ class CodebaseAnalyzer:
            - 不是配置文件或测试文件
         4. 对每个选中的文件，建议具体的修改策略
 
-        请直接以JSON格式返回你的选择，不需要其他说明，确保返回结果能被Python的json.loads()解析：
+        请直接以JSON格式返回你的选择，不需要其他说明，确保返回结果能被Python的json.loads()解析，不需要返回markdown代码块：
         {{
             "selected_files": [
                 {{
@@ -353,9 +353,14 @@ class CodebaseAnalyzer:
 if __name__ == "__main__":
     c = CodebaseAnalyzer({
         "api_key": "sk-2Lnu8Q3cLlMqIP2t6d428b1b678c4d13A4A7F53434C8E791",
-        "base_url": "",
+        "base_url": "https://aihubmix.com",
         "model": "claude-sonnet-4-20250514",
         "provider": "anthropic"
     })
 
-    c.analyze_repository(Path(r"C:\Users\dongs\Desktop\sudo-win"))
+    x = c.analyze_repository(Path(r"C:\Users\dongs\Desktop\sudo-win"))
+    print(json.dumps(x, indent=2, ensure_ascii=False))
+
+    y = c.select_modification_targets(x, 3)
+    print(json.dumps(y, indent=2, ensure_ascii=False))
+

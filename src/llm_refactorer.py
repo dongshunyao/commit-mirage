@@ -51,7 +51,7 @@ class LLMRefactorer:
         3. 不要破坏现有功能
         4. 保持代码风格一致
 
-        请返回修改后的完整代码和简短的变更说明，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析
+        请返回修改后的完整代码和简短的变更说明，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析，不需要返回markdown代码块：
 
         格式：
         {{
@@ -64,7 +64,6 @@ class LLMRefactorer:
         add_response = self._call_llm(add_prompt)
         add_result = self._parse_llm_response(add_response)
 
-        # 第二步：删除添加的功能
         remove_prompt = f"""
         现在我需要你删除刚才添加的功能，让代码回到原始状态。
 
@@ -83,7 +82,7 @@ class LLMRefactorer:
         2. 确保代码完全回到原始状态
         3. 不要遗留任何添加的代码
 
-        请返回删除功能后的代码，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析
+        请返回删除功能后的代码，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析，不需要返回markdown代码块：
 
         格式：
         {{
