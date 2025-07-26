@@ -27,11 +27,8 @@ class CodebaseAnalyzer:
         summary = {
             "total_files": 0,
             "code_files": [],
-            "file_structure": {},
-            "complexity_analysis": {},
             "modification_candidates": [],
             "language_distribution": {},
-            "dependency_graph": {}
         }
 
         # 收集基本文件信息
@@ -191,10 +188,10 @@ class CodebaseAnalyzer:
         candidates = []
 
         for file_info in code_files:
-            min_lines = 30 if file_info["language"] in ["python", "javascript", "typescript"] else 50
+            min_lines = 20 if file_info["language"] in ["python", "javascript", "typescript"] else 40
             max_lines = 800 if file_info["language"] in ["c", "cpp", "java"] else 600
 
-            if min_lines <= file_info["lines"] <= max_lines and file_info["modification_potential"] > 3.0:
+            if min_lines <= file_info["lines"] <= max_lines:
                 candidate = {
                     "file_info": file_info,
                     "modification_potential": file_info["modification_potential"],
@@ -298,7 +295,6 @@ class CodebaseAnalyzer:
     def _prepare_repo_overview(self, codebase_summary: Dict) -> Dict:
         overview = {
             "total_files": codebase_summary["total_files"],
-            "technologies": list(codebase_summary["technologies"]),
             "modification_candidates": []
         }
 
