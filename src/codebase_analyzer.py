@@ -1,3 +1,5 @@
+import os
+import sys
 import fnmatch
 import json
 import random
@@ -55,17 +57,37 @@ class CodebaseAnalyzer:
         # TODO 把 .gitignore 塞进来
         # 扩展的忽略模式
         ignore_patterns = [
-            "*/node_modules/*", "*/.git/*", "*/venv/*", "*/__pycache__/*",
-            "*/target/*", "*/build/*", "*/dist/*", "*/.pytest_cache/*",
-            "*/vendor/*", "*/third_party/*", "*/.gradle/*", "*/cmake-build-*/*",
-            "*/.idea/*", "*/.vscode/*", "*/bin/*", "*/obj/*",
             "*node_modules/*", "*.git/*", "*venv/*", "*__pycache__/*",
             "*target/*", "*build/*", "*dist/*", "*.pytest_cache/*",
             "*vendor/*", "*third_party/*", "*.gradle/*", "*cmake-build-*/*",
-            "*.idea/*", "*.vscode/*", "*bin/*", "*obj/*"
+            "*.idea/*", "*.vscode/*", "*bin/*", "*obj/*",
+            "*node_modules\\*", "*.git\\*", "*venv\\*", "*__pycache__\\*",
+            "*target\\*", "*build\\*", "*dist\\*", "*.pytest_cache\\*",
+            "*vendor\\*", "*third_party\\*", "*.gradle\\*", "*cmake-build-*\\*",
+            "*.idea\\*", "*.vscode\\*", "*bin\\*", "*obj\\*"
         ]
 
-        for file_path in repo_path.rglob("*"):
+        toplevels = os.listdir(str(repo_path))
+        queries = []
+        for toplevel in toplevels:
+            fullpath = os.path.join(str(repo_path), toplevel)
+            if os.path.isdir(fullpath):
+                fullpath += os.path.sep
+                if not any(fnmatch.fnmatch(fullpath, pattern) for pattern in ignore_patterns):
+                    queries.append(fullpath)
+        # print_err(queries)
+
+        all = []
+        for toplevel in toplevels:
+            fullpath = os.path.join(str(repo_path), toplevel)
+            if os.path.isfile(fullpath):
+                all.append(Path(fullpath))
+
+        for query in queries:
+            all += Path(query).rglob("*")
+        # print_err(all)
+
+        for file_path in all:
             if file_path.is_file() and file_path.suffix in self.supported_languages:
                 relative_path = file_path.relative_to(repo_path)
                 if any(fnmatch.fnmatch(str(relative_path), pattern) for pattern in ignore_patterns):
