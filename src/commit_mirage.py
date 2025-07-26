@@ -48,6 +48,50 @@ class CommitMirage:
         target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
+
+        # # refactor_plan = ["A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-", "E+", "E-", "F+", "F-", "G+", "G-"]
+        # refactor_plan = ["A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-", "E+", "E-", "F+", "F-"]
+        # # refactor_plan = ["A+", "A-"]
+        # self.opts["times"] = 2
+
+        final_plan = []
+        add_plan = []
+        delete_plan = []
+        for i in range(len(refactor_plan)):
+            if i % 2 == 0:
+                add_plan.append(refactor_plan[i])
+            else:
+                delete_plan.append(refactor_plan[i])
+
+        if self.opts["times"] == 2:
+            count = len(add_plan) // 2
+            final_plan.append([])
+            final_plan.append([])
+            for i in range(0, count):
+                final_plan[0].append(add_plan[i])
+                final_plan[0].append(delete_plan[i])
+            final_plan[0].append(add_plan[count])
+            final_plan[1].append(delete_plan[count])
+            for i in range(count + 1, len(add_plan)):
+                final_plan[1].append(add_plan[i])
+                final_plan[1].append(delete_plan[i])
+        else:
+            left = len(add_plan) - 1
+            count = (left + (left % (self.opts["times"] - 2))) // (self.opts["times"] - 2)
+            final_plan.append([add_plan[0]])
+            current = 0
+            for i in range(0, self.opts["times"] - 2):
+                final_plan.append([])
+                for i in range(0, count):
+                    if current == len(delete_plan) -1:
+                        break
+                    final_plan[-1].append(delete_plan[i])
+                    current += 1
+                    final_plan[-1].append(add_plan[current])
+            final_plan.append([delete_plan[-1]])
+
+        self.print_debug(final_plan)
+
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
 
