@@ -1,5 +1,6 @@
 import math
 import sys
+import json
 from datetime import datetime
 from pathlib import Path
 from random import randrange
@@ -120,6 +121,7 @@ class CommitMirage:
         patch = git.diff(f"{current}~{self.opts['times']}", current, self.opts["dir"])
         if len(patch.strip()) != 0:
             git.apply_reverse(patch, self.opts["dir"])
+            git.add_all(self.opts["dir"])
             git.commit_amend_with_time(random_times[-1], self.opts["dir"])
 
         if self.opts["commit"] is not None:
