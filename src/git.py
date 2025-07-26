@@ -49,7 +49,7 @@ def delete_branch(branch, dir="."):
 
 
 def checkout(commit, dir="."):
-    command = f"git commit {commit}"
+    command = f"git checkout {commit}"
     return check_output(command, cwd=dir, encoding="utf-8", shell=True)
 
 
