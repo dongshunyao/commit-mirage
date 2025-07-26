@@ -47,6 +47,33 @@ class CommitMirage:
         target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
+
+        # TODO delete
+        for i in range(len(refactor_plan)):
+            if i % 2 == 0:
+                item = refactor_plan[i]
+                with open(item["file_path"], 'w', encoding='utf-8') as f:
+                    f.write(item["new_content"])
+        return
+
+        add_plan = []
+        delete_plan = []
+
+        for i in range(len(refactor_plan)):
+            if i % 2 == 0:
+                add_plan.append(refactor_plan[i])
+            else:
+                delete_plan.append(refactor_plan[i])
+
+        final_plan = []
+        final_plan.append(add_plan[0])
+        add_plan.pop(0)
+
+        count = self.opts["times"] - 1
+
+        while count >1:
+            count-=1
+
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
 

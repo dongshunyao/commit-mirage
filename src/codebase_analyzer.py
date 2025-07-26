@@ -1,7 +1,6 @@
-import os
-import sys
 import fnmatch
 import json
+import os
 import random
 from math import floor
 from pathlib import Path
@@ -54,7 +53,6 @@ class CodebaseAnalyzer:
     def _collect_code_files(self, repo_path: Path) -> List[Dict[str, Any]]:
         code_files = []
 
-        # TODO 把 .gitignore 塞进来
         # 扩展的忽略模式
         ignore_patterns = [
             "*node_modules/*", "*.git/*", "*venv/*", "*__pycache__/*",
@@ -67,25 +65,23 @@ class CodebaseAnalyzer:
             "*.idea\\*", "*.vscode\\*", "*bin\\*", "*obj\\*"
         ]
 
-        toplevels = os.listdir(str(repo_path))
+        top_levels = os.listdir(str(repo_path))
         queries = []
-        for toplevel in toplevels:
+        for toplevel in top_levels:
             fullpath = os.path.join(str(repo_path), toplevel)
             if os.path.isdir(fullpath):
                 fullpath += os.path.sep
                 if not any(fnmatch.fnmatch(fullpath, pattern) for pattern in ignore_patterns):
                     queries.append(fullpath)
-        # print_err(queries)
 
         all = []
-        for toplevel in toplevels:
+        for toplevel in top_levels:
             fullpath = os.path.join(str(repo_path), toplevel)
             if os.path.isfile(fullpath):
                 all.append(Path(fullpath))
 
         for query in queries:
             all += Path(query).rglob("*")
-        # print_err(all)
 
         for file_path in all:
             if file_path.is_file() and file_path.suffix in self.supported_languages:
@@ -291,7 +287,7 @@ class CodebaseAnalyzer:
             print_err(f"没有足够合适的文件")
             raise Exception
 
-        file_count = random.randint(commits - 1, min(codebase_summary["total_files"], floor(2.1 * commits)))
+        file_count = random.randint(commits - 1, min(codebase_summary["total_files"], round(2.1 * commits)))
 
         prompt = f"""
         你是一个代码分析专家。我需要你帮我选择在一个代码仓库中要修改的文件，用于创建{commits}个Git提交。

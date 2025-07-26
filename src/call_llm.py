@@ -16,7 +16,7 @@ def call_llm(llm_config: Dict[str, Any], prompt: str) -> str:
         client = anthropic.Anthropic(api_key=llm_config["api_key"], base_url=llm_config["base_url"])
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=7000,
+            max_tokens=6500,
             messages=[{"role": "user", "content": prompt}]
         )
 
