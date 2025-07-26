@@ -50,5 +50,5 @@ if __name__ == "__main__":
         printerr("Generate times must be 3 or larger.")
         sys.exit(2)
 
-    generator = CommitMirage(args)
+    generator = CommitMirage(opts)
     generator.run()
