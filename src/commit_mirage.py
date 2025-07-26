@@ -1,5 +1,6 @@
 import sys
 from datetime import datetime
+from pathlib import Path
 from random import randrange
 
 from src import git
@@ -36,7 +37,7 @@ class CommitMirage:
     def run(self):
         branch = None
         current = None
-        codebase_summary = self.analyzer.analyze_repository(self.opts["dir"])
+        codebase_summary = self.analyzer.analyze_repository(Path(self.opts["dir"]))
         target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
         refactor_plan = self.refactorer.create_refactor_plan(target_files)
         random_times = self.get_random_times()

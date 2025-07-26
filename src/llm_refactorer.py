@@ -115,7 +115,7 @@ class LLMRefactorer:
             import openai
             client = openai.OpenAI(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
             response = client.chat.completions.create(
-                model=self.llm_config["model"],
+                model="gpt-4.1",
                 messages=[{"role": "user", "content": prompt}],
             )
             return response.choices[0].message.content
@@ -123,7 +123,7 @@ class LLMRefactorer:
             import anthropic
             client = anthropic.Anthropic(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
             response = client.messages.create(
-                model=self.llm_config["model"],
+                model="claude-sonnet-4-20250514",
                 max_tokens=8192,
                 messages=[{"role": "user", "content": prompt}]
             )
