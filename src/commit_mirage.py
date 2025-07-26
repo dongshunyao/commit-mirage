@@ -1,6 +1,5 @@
-import math
 import sys
-import json
+import time
 from datetime import datetime
 from pathlib import Path
 from random import randrange
@@ -10,7 +9,7 @@ from codebase_analyzer import CodebaseAnalyzer
 from llm_refactorer import LLMRefactorer
 from utils import print_err
 
-TEMP_BRANCH_NAME = "cmtemp"
+TEMP_BRANCH_NAME = f"temp_{str(int(time.time()))}"
 
 
 class CommitMirage:
@@ -50,11 +49,6 @@ class CommitMirage:
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
 
-        # # refactor_plan = ["A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-", "E+", "E-", "F+", "F-", "G+", "G-"]
-        # refactor_plan = ["A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-", "E+", "E-", "F+", "F-"]
-        # # refactor_plan = ["A+", "A-"]
-        # self.opts["times"] = 2
-
         final_plan = []
         add_plan = []
         delete_plan = []
@@ -78,24 +72,20 @@ class CommitMirage:
                 final_plan[1].append(delete_plan[i])
         else:
             left = len(add_plan) - 1
-            middle = self.opts["times"] - 2
-            count = left // middle
-            if left % middle != 0:
-                count = ((left - (left % middle)) // middle) + 1
-            self.print_debug(count)
+            count = left // (self.opts["times"] - 2)
+            if left % (self.opts["times"] - 2) != 0:
+                count = count + 1
             final_plan.append([add_plan[0]])
             current = 0
             for i in range(0, self.opts["times"] - 2):
                 final_plan.append([])
                 for j in range(0, count):
-                    if current == len(delete_plan) -1:
+                    if current == len(delete_plan) - 1:
                         break
                     final_plan[-1].append(delete_plan[current])
                     current += 1
                     final_plan[-1].append(add_plan[current])
             final_plan.append([delete_plan[-1]])
-
-        self.print_debug(json.dumps(final_plan, indent=2, ensure_ascii=False))
 
         self.print_debug("选择时间……")
         random_times = self.get_random_times()

@@ -2,7 +2,6 @@ import fnmatch
 import json
 import os
 import random
-from math import floor
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -233,7 +232,7 @@ class CodebaseAnalyzer:
             x["file_info"]["language"]  # 优先选择不同语言的文件
         ), reverse=True)
 
-        return candidates[:25]
+        return candidates[:21]
 
     def _get_language_features(self, file_info: Dict) -> Dict[str, Any]:
         language = file_info["language"]
@@ -287,7 +286,7 @@ class CodebaseAnalyzer:
             print_err(f"没有足够合适的文件")
             raise Exception
 
-        file_count = random.randint(commits - 1, min(codebase_summary["total_files"], round(2.1 * commits)))
+        file_count = random.randint(commits - 1, min(codebase_summary["total_files"], round(1.9 * commits)))
 
         prompt = f"""
         你是一个代码分析专家。我需要你帮我选择在一个代码仓库中要修改的文件，用于创建{commits}个Git提交。
@@ -358,18 +357,3 @@ class CodebaseAnalyzer:
             })
 
         return selected
-
-
-# TODO delete
-if __name__ == "__main__":
-    c = CodebaseAnalyzer({
-        "api_key": "sk-2Lnu8Q3cLlMqIP2t6d428b1b678c4d13A4A7F53434C8E791",
-        "base_url": "https://aihubmix.com",
-        "provider": "anthropic"
-    })
-
-    x = c.analyze_repository(Path(r"C:\Users\dongs\Desktop\sudo-win"))
-    print(json.dumps(x, indent=2, ensure_ascii=False))
-
-    y = c.select_modification_targets(x, 3)
-    print(json.dumps(y, indent=2, ensure_ascii=False))
