@@ -1,15 +1,14 @@
-from random import randrange
+import sys
 from datetime import datetime
+from random import randrange
 
-
-from commit_manager import CommitManager
-
+from src import git
 from src.codebase_analyzer import CodebaseAnalyzer
 from src.llm_refactorer import LLMRefactorer
-from src import git
 from src.utils import printerr
 
 TEMP_BRANCH_NAME = "cmtemp"
+
 
 class CommitMirage:
     def __init__(self, opts):
