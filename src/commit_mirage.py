@@ -77,15 +77,19 @@ class CommitMirage:
                 final_plan[1].append(delete_plan[i])
         else:
             left = len(add_plan) - 1
-            count = (left + (left % (self.opts["times"] - 2))) // (self.opts["times"] - 2)
+            middle = self.opts["times"] - 2
+            count = left // middle
+            if left % middle != 0:
+                count = ((left - (left % middle)) // middle) + 1
+            self.print_debug(count)
             final_plan.append([add_plan[0]])
             current = 0
             for i in range(0, self.opts["times"] - 2):
                 final_plan.append([])
-                for i in range(0, count):
+                for j in range(0, count):
                     if current == len(delete_plan) -1:
                         break
-                    final_plan[-1].append(delete_plan[i])
+                    final_plan[-1].append(delete_plan[current])
                     current += 1
                     final_plan[-1].append(add_plan[current])
             final_plan.append([delete_plan[-1]])
@@ -99,16 +103,22 @@ class CommitMirage:
             branch = git.get_branch_name(self.opts["dir"])
             self.print_debug(f"branch name: {branch}")
             git.new_branch(TEMP_BRANCH_NAME, self.opts["commit"], self.opts["dir"])
-        for i in range(0, len(random_times)):
+
+        for i in range(0, self.opts["times"]):
             t = random_times[i]
-            # message = modify_work_space()
-            # git.add_all(self.opts["dir"])
-            # git.commit_with_time(message, t, self.opts["dir"])
-            # current = git.get_head_hash(self.opts["dir"])
+            c = final_plan[i]
+            message = ""
+            for p in c:
+                message += p["commit_message"]
+                with open(p["file_path"], 'w', encoding='utf-8') as f:
+                    f.write(p["new_content"])
+            git.add_all(self.opts["dir"])
+            git.commit_with_time(message, t, self.opts["dir"])
+            current = git.get_head_hash(self.opts["dir"])
             self.print_debug(f"{t} {datetime.fromtimestamp(t).isoformat()}")
 
         patch = git.diff(f"{current}~{self.opts['times']}", current, self.opts["dir"])
-        if len(patch.trim()) != 0:
+        if len(patch.strip()) != 0:
             git.apply_reverse(patch, self.opts["dir"])
             git.commit_amend_with_time(random_times[-1], self.opts["dir"])
 
@@ -117,4 +127,4 @@ class CommitMirage:
             git.checkout(branch, self.opts["dir"])
             git.delete_branch(TEMP_BRANCH_NAME, self.opts["dir"])
 
-        return current
+        print(current)
