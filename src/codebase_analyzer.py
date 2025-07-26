@@ -56,7 +56,11 @@ class CodebaseAnalyzer:
             "*/node_modules/*", "*/.git/*", "*/venv/*", "*/__pycache__/*",
             "*/target/*", "*/build/*", "*/dist/*", "*/.pytest_cache/*",
             "*/vendor/*", "*/third_party/*", "*/.gradle/*", "*/cmake-build-*/*",
-            "*/.idea/*", "*/.vscode/*", "*/bin/*", "*/obj/*"
+            "*/.idea/*", "*/.vscode/*", "*/bin/*", "*/obj/*",
+            "*node_modules/*", "*.git/*", "*venv/*", "*__pycache__/*",
+            "*target/*", "*build/*", "*dist/*", "*.pytest_cache/*",
+            "*vendor/*", "*third_party/*", "*.gradle/*", "*cmake-build-*/*",
+            "*.idea/*", "*.vscode/*", "*bin/*", "*obj/*"
         ]
 
         for file_path in repo_path.rglob("*"):

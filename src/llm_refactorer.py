@@ -53,6 +53,7 @@ class LLMRefactorer:
         2. 确保添加的代码是高质量的、有意义的
         3. 不要破坏现有功能
         4. 保持代码风格一致
+        5. 如果文件末尾有空白或者换行符，请不要修改它，保持原样就好
 
         请返回修改后的完整代码和简短的变更说明，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析，不需要返回markdown代码块：
 
@@ -84,6 +85,7 @@ class LLMRefactorer:
         1. 精确删除之前添加的功能
         2. 确保代码完全回到原始状态
         3. 不要遗留任何添加的代码
+        4. 如果文件末尾有空白或者换行符，请不要修改它，保持原样就好
 
         请返回删除功能后的代码，请直接以JSON格式返回结果，不需要其他说明，确保返回结果能被Python的json.loads()解析，不需要返回markdown代码块：
 
@@ -127,3 +129,34 @@ class LLMRefactorer:
                 "changes_description": "LLM响应解析失败",
                 "commit_message": "自动生成的更改"
             }
+
+
+if __name__ == "__main__":
+    l = LLMRefactorer({
+        "api_key": "sk-2Lnu8Q3cLlMqIP2t6d428b1b678c4d13A4A7F53434C8E791",
+        "base_url": "https://aihubmix.com",
+        "provider": "anthropic"
+    })
+
+    t = [
+        {
+            "file_path": "sudo-win\\main.cpp",
+            "reason": "唯一的候选文件，具有良好的扩展潜力，包含多种可操作的改进点，文件大小适中（40行），是主程序文件而非配置或测试文件",
+            "modification_strategy": "先添加错误处理和日志记录功能来增强程序健壮性，然后提取辅助函数来改善代码结构，最后删除这些添加的功能恢复原始状态",
+            "operations": [
+                "add_error_handling",
+                "add_logging",
+                "extract_method",
+                "remove_additions"
+            ]
+        }
+    ]
+
+    r = l.create_refactor_plan(t, r"C:\Users\dongs\Desktop\sudo-win")
+    print(json.dumps(r, indent=2, ensure_ascii=False))
+
+    for i in range(len(r)):
+        if i % 2 == 0:
+            item = r[i]
+            with open(item["file_path"], 'w', encoding='utf-8') as f:
+                f.write(item["new_content"])
