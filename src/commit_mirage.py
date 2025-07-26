@@ -48,54 +48,6 @@ class CommitMirage:
         target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
-
-        final_plan = []
-        add_plan = []
-        delete_plan = []
-        for i in range(len(refactor_plan)):
-            if i % 2 == 0:
-                add_plan.append(refactor_plan[i])
-            else:
-                delete_plan.append(refactor_plan[i])
-
-        final_plan.append([add_plan[0]])
-        add_plan.pop(0)
-
-        count = self.opts["times"] - 1
-        delta = math.ceil((len(refactor_plan) - 1) / (self.opts["times"] - 2))
-
-        for i in range(count - 2):
-            plan = []
-            if i == count - 2 - 1:
-                for j in range(len(add_plan)):
-                    plan.append(add_plan[0])
-                    add_plan.pop(0)
-                    plan.append(delete_plan[0])
-                    delete_plan.pop(0)
-            else:
-                for j in range(delta):
-                    plan.append(add_plan[0])
-                    add_plan.pop(0)
-                    plan.append(delete_plan[0])
-                    delete_plan.pop(0)
-            final_plan.append(plan)
-
-        final_plan.append([delete_plan[0]])
-        delete_plan.pop(0)
-
-        assert len(add_plan) == 0
-        assert len(delete_plan) == 0
-        assert len(final_plan) == self.opts["times"]
-
-        # TODO delete
-        for i in range(len(refactor_plan)):
-            if i % 2 == 0:
-                item = refactor_plan[i]
-                with open(item["file_path"], 'w', encoding='utf-8') as f:
-                    f.write(item["new_content"])
-        return
-
-
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
 
