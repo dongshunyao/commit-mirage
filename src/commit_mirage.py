@@ -1,6 +1,6 @@
+import json
 import sys
 import time
-import json
 from datetime import datetime
 from pathlib import Path
 from random import randrange
