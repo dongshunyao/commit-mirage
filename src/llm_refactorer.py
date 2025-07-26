@@ -1,5 +1,8 @@
 import json
+import os
 from typing import List, Dict, Any
+
+from src.call_llm import call_llm
 
 
 class LLMRefactorer:
@@ -16,7 +19,7 @@ class LLMRefactorer:
                 original_content = f.read()
 
             file_commits = self._generate_file_commits(
-                file_path,
+                str(file_path),
                 original_content,
                 file_target,
                 commit_prefix=f"[File {i + 1}]"
@@ -61,7 +64,7 @@ class LLMRefactorer:
         }}
         """
 
-        add_response = self._call_llm(add_prompt)
+        add_response = call_llm(self.llm_config, add_prompt)
         add_result = self._parse_llm_response(add_response)
 
         remove_prompt = f"""
@@ -92,7 +95,7 @@ class LLMRefactorer:
         }}
         """
 
-        remove_response = self._call_llm(remove_prompt)
+        remove_response = call_llm(self.llm_config, remove_prompt)
         remove_result = self._parse_llm_response(remove_response)
 
         return [
@@ -110,35 +113,12 @@ class LLMRefactorer:
             }
         ]
 
-    def _call_llm(self, prompt: str) -> str:
-        if self.llm_config["provider"] == "openai":
-            import openai
-            client = openai.OpenAI(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
-            response = client.chat.completions.create(
-                model="gpt-4.1",
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return response.choices[0].message.content
-        elif self.llm_config["provider"] == "anthropic":
-            import anthropic
-            client = anthropic.Anthropic(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=8192,
-                messages=[{"role": "user", "content": prompt}]
-            )
-
-            if response.stop_reason == "end_turn":
-                return response.content[0].text
-
-        raise Exception
-
     def _parse_llm_response(self, response: str) -> Dict:
         try:
             return json.loads(response)
         except:
             import re
-            json_match = re.search(r'```json\s*(\{.*?\})\s*```', response, re.DOTALL)
+            json_match = re.search(r'```json\s*(\{.*?})\s*```', response, re.DOTALL)
             if json_match:
                 return json.loads(json_match.group(1))
 

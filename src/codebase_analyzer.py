@@ -4,6 +4,8 @@ import random
 from pathlib import Path
 from typing import List, Dict, Any
 
+from src.call_llm import call_llm
+
 
 class CodebaseAnalyzer:
     def __init__(self, llm_config: Dict[str, Any]):
@@ -289,7 +291,7 @@ class CodebaseAnalyzer:
         """
 
         try:
-            response = self._call_llm(prompt)
+            response = call_llm(self.llm_config, prompt)
             result = json.loads(response)
             return result["selected_files"]
         except Exception as e:
@@ -314,29 +316,6 @@ class CodebaseAnalyzer:
             })
 
         return overview
-
-    def _call_llm(self, prompt: str) -> str:
-        if self.llm_config["provider"] == "openai":
-            import openai
-            client = openai.OpenAI(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
-            response = client.chat.completions.create(
-                model="gpt-4.1",
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return response.choices[0].message.content
-        elif self.llm_config["provider"] == "anthropic":
-            import anthropic
-            client = anthropic.Anthropic(api_key=self.llm_config["api_key"], base_url=self.llm_config["base_url"])
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=8192,
-                messages=[{"role": "user", "content": prompt}]
-            )
-
-            if response.stop_reason == "end_turn":
-                return response.content[0].text
-
-        raise Exception
 
     def _fallback_selection(self, codebase_summary: Dict, file_count: int) -> List[Dict]:
         candidates = codebase_summary["modification_candidates"][:file_count]
