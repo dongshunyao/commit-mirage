@@ -43,6 +43,12 @@ class CommitMirage:
 
         branch = None
         current = None
+
+        if self.opts["commit"] is not None:
+            branch = git.get_branch_name(self.opts["dir"])
+            self.print_debug(f"branch name: {branch}")
+            git.new_branch(TEMP_BRANCH_NAME, self.opts["commit"], self.opts["dir"])
+
         self.print_debug("分析仓库……")
         codebase_summary = self.analyzer.analyze_repository(Path(self.opts["dir"]))
         self.print_debug("选择目标……")
@@ -95,11 +101,6 @@ class CommitMirage:
         self.print_debug(json.dumps(final_plan, indent=2, ensure_ascii=False))
         self.print_debug("选择时间……")
         random_times = self.get_random_times()
-
-        if self.opts["commit"] is not None:
-            branch = git.get_branch_name(self.opts["dir"])
-            self.print_debug(f"branch name: {branch}")
-            git.new_branch(TEMP_BRANCH_NAME, self.opts["commit"], self.opts["dir"])
 
         for i in range(0, self.opts["times"]):
             t = random_times[i]
