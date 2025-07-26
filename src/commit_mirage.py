@@ -124,6 +124,7 @@ class CommitMirage:
                 git.apply_reverse(patch, self.opts["dir"])
                 git.add_all(self.opts["dir"])
                 git.commit_amend_with_time(random_times[-1], self.opts["dir"])
+                current = git.get_head_hash(self.opts["dir"])
             except:
                 self.print_debug(patch)
 
