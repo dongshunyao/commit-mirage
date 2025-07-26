@@ -22,7 +22,7 @@ class CommitMirage:
         self.analyzer = CodebaseAnalyzer(llm_config)
         self.refactorer = LLMRefactorer(llm_config)
 
-    def printdebug(self, *args, **kwargs):
+    def print_debug(self, *args, **kwargs):
         if self.opts["debug"]:
             print_err(*args, **kwargs)
 
@@ -35,19 +35,24 @@ class CommitMirage:
         return results
 
     def run(self):
-        branch = None
-        current = None
-        codebase_summary = self.analyzer.analyze_repository(Path(self.opts["dir"]))
-        target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
-        refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
-        random_times = self.get_random_times()
-
         if git.check_dirty(self.opts["dir"]):
             print_err("此程序只能在干净的工作目录中运行。")
             sys.exit(3)
+
+        branch = None
+        current = None
+        self.print_debug("分析仓库……")
+        codebase_summary = self.analyzer.analyze_repository(Path(self.opts["dir"]))
+        self.print_debug("选择目标……")
+        target_files = self.analyzer.select_modification_targets(codebase_summary, self.opts["times"])
+        self.print_debug("创建计划……")
+        refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
+        self.print_debug("选择时间……")
+        random_times = self.get_random_times()
+
         if self.opts["commit"] is not None:
             branch = git.get_branch_name(self.opts["dir"])
-            self.printdebug(f"branch name: {branch}")
+            self.print_debug(f"branch name: {branch}")
             git.new_branch(TEMP_BRANCH_NAME, self.opts["commit"], self.opts["dir"])
         for i in range(0, len(random_times)):
             t = random_times[i]
@@ -55,7 +60,7 @@ class CommitMirage:
             # git.add_all(self.opts["dir"])
             # git.commit_with_time(message, t, self.opts["dir"])
             # current = git.get_head_hash(self.opts["dir"])
-            self.printdebug(f"{t} {datetime.fromtimestamp(t).isoformat()}")
+            self.print_debug(f"{t} {datetime.fromtimestamp(t).isoformat()}")
         # TODO: Check final state and may add revert.
         if self.opts["commit"] is not None:
             git.rebase(TEMP_BRANCH_NAME, branch, self.opts["dir"])
