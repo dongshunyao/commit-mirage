@@ -48,6 +48,7 @@ class CommitMirage:
         self.print_debug("创建计划……")
         refactor_plan = self.refactorer.create_refactor_plan(target_files, self.opts["dir"])
 
+        # TODO delete
         for i in range(len(refactor_plan)):
             if i % 2 == 0:
                 item = refactor_plan[i]
